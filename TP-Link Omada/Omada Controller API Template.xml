@@ -1,0 +1,560 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2023-08-01T11:13:47Z</date>
+    <groups>
+        <group>
+            <name>Templates</name>
+        </group>
+    </groups>
+    <templates>
+        <template>
+            <template>Omada Controller API Template</template>
+            <name>Omada Controller API Template</name>
+            <groups>
+                <group>
+                    <name>Templates</name>
+                </group>
+            </groups>
+            <applications>
+                <application>
+                    <name>OmadaAPI</name>
+                </application>
+            </applications>
+            <items>
+                <item>
+                    <name>Количество подключенных точек доступа</name>
+                    <type>DEPENDENT</type>
+                    <key>connectedApNum</key>
+                    <delay>0</delay>
+                    <applications>
+                        <application>
+                            <name>OmadaAPI</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$..connectedApNum</params>
+                        </step>
+                        <step>
+                            <type>LTRIM</type>
+                            <params>[</params>
+                        </step>
+                        <step>
+                            <type>RTRIM</type>
+                            <params>]</params>
+                        </step>
+                        <step>
+                            <type>JAVASCRIPT</type>
+                            <params> nums = value.split(',').map(Number);
+
+ var sum = 0 
+
+  for ( var i = 0; i &lt; nums.length; i += 1) {
+  sum += nums[i]
+  }
+
+  return sum
+</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>omada.wifi</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Get Omada AP devices</name>
+                    <key>omada.discover.devices</key>
+                    <delay>15m</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>OmadaAPI</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <params>}{
+},{</params>
+                        </step>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.result</params>
+                        </step>
+                    </preprocessing>
+                </item>
+                <item>
+                    <name>Get List of Sites</name>
+                    <key>omada.sites</key>
+                    <delay>1d</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>OmadaAPI</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$.result.privilege.sites</params>
+                        </step>
+                    </preprocessing>
+                </item>
+                <item>
+                    <name>Get the Wifi Summary</name>
+                    <key>omada.wifi</key>
+                    <delay>15m</delay>
+                    <trends>0</trends>
+                    <value_type>TEXT</value_type>
+                    <applications>
+                        <application>
+                            <name>OmadaAPI</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>STR_REPLACE</type>
+                            <params>}{
+},{</params>
+                        </step>
+                    </preprocessing>
+                </item>
+                <item>
+                    <name>Процент недоступных точек доступа</name>
+                    <type>CALCULATED</type>
+                    <key>percent.unavailable.AP</key>
+                    <delay>15m</delay>
+                    <value_type>FLOAT</value_type>
+                    <units>%</units>
+                    <params>100-last(connectedApNum)/last(totalApNum)*100</params>
+                    <applications>
+                        <application>
+                            <name>OmadaAPI</name>
+                        </application>
+                    </applications>
+                    <triggers>
+                        <trigger>
+                            <expression>{last()}&gt;=80</expression>
+                            <name>Процент недоступных точек доступа {ITEM.LASTVALUE} %</name>
+                            <priority>AVERAGE</priority>
+                            <manual_close>YES</manual_close>
+                        </trigger>
+                    </triggers>
+                </item>
+                <item>
+                    <name>Общее количество точек доступа</name>
+                    <type>DEPENDENT</type>
+                    <key>totalApNum</key>
+                    <delay>0</delay>
+                    <applications>
+                        <application>
+                            <name>OmadaAPI</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$..totalApNum</params>
+                        </step>
+                        <step>
+                            <type>LTRIM</type>
+                            <params>[</params>
+                        </step>
+                        <step>
+                            <type>RTRIM</type>
+                            <params>]</params>
+                        </step>
+                        <step>
+                            <type>JAVASCRIPT</type>
+                            <params> nums = value.split(',').map(Number);
+
+ var sum = 0 
+
+  for ( var i = 0; i &lt; nums.length; i += 1) {
+  sum += nums[i]
+  }
+
+  return sum
+</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>omada.wifi</key>
+                    </master_item>
+                </item>
+                <item>
+                    <name>Number of wireless clients</name>
+                    <type>DEPENDENT</type>
+                    <key>wirelessClientNum</key>
+                    <delay>0</delay>
+                    <applications>
+                        <application>
+                            <name>OmadaAPI</name>
+                        </application>
+                    </applications>
+                    <preprocessing>
+                        <step>
+                            <type>JSONPATH</type>
+                            <params>$..wirelessClientNum</params>
+                        </step>
+                        <step>
+                            <type>LTRIM</type>
+                            <params>[</params>
+                        </step>
+                        <step>
+                            <type>RTRIM</type>
+                            <params>]</params>
+                        </step>
+                        <step>
+                            <type>JAVASCRIPT</type>
+                            <params> nums = value.split(',').map(Number);
+
+ var sum = 0 
+
+  for ( var i = 0; i &lt; nums.length; i += 1) {
+  sum += nums[i]
+  }
+
+  return sum
+</params>
+                        </step>
+                    </preprocessing>
+                    <master_item>
+                        <key>omada.wifi</key>
+                    </master_item>
+                </item>
+            </items>
+            <discovery_rules>
+                <discovery_rule>
+                    <name>Parse JSON discovered AP</name>
+                    <type>DEPENDENT</type>
+                    <key>omada.JSON.discover.devices</key>
+                    <delay>0</delay>
+                    <lifetime>8h</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>StatusCategory for {#APNAME}</name>
+                            <type>DEPENDENT</type>
+                            <key>prototype.ap-statusCategory[{#APNAME}]</key>
+                            <delay>0</delay>
+                            <applications>
+                                <application>
+                                    <name>OmadaAPI</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Omada TP-link StatusCategory</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$.[?(@.name == &quot;{#APNAME}&quot;)].statusCategory</params>
+                                </step>
+                                <step>
+                                    <type>LTRIM</type>
+                                    <params>[</params>
+                                </step>
+                                <step>
+                                    <type>RTRIM</type>
+                                    <params>]</params>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>omada.discover.devices</key>
+                            </master_item>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last(#3)}&lt;&gt;1</expression>
+                                    <name>Точка доступа {#APNAME} недоступна statusCategory {ITEM.LASTVALUE}</name>
+                                    <priority>AVERAGE</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Status for {#APNAME}</name>
+                            <type>DEPENDENT</type>
+                            <key>prototype.ap-status[{#APNAME}]</key>
+                            <delay>0</delay>
+                            <applications>
+                                <application>
+                                    <name>OmadaAPI</name>
+                                </application>
+                            </applications>
+                            <valuemap>
+                                <name>Omada TP-link Status</name>
+                            </valuemap>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$.[?(@.name == &quot;{#APNAME}&quot;)].status</params>
+                                </step>
+                                <step>
+                                    <type>LTRIM</type>
+                                    <params>[</params>
+                                </step>
+                                <step>
+                                    <type>RTRIM</type>
+                                    <params>]</params>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>omada.discover.devices</key>
+                            </master_item>
+                            <trigger_prototypes>
+                                <trigger_prototype>
+                                    <expression>{last(#3)}&lt;&gt;14</expression>
+                                    <name>Точка доступа {#APNAME} недоступна status {ITEM.LASTVALUE}</name>
+                                    <priority>AVERAGE</priority>
+                                    <manual_close>YES</manual_close>
+                                </trigger_prototype>
+                            </trigger_prototypes>
+                        </item_prototype>
+                        <item_prototype>
+                            <name>Uptime {#APNAME}</name>
+                            <type>DEPENDENT</type>
+                            <key>prototype.ap-uptime[{#APNAME}]</key>
+                            <delay>0</delay>
+                            <units>uptime</units>
+                            <applications>
+                                <application>
+                                    <name>OmadaAPI</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$.[?(@.name == &quot;{#APNAME}&quot;)].uptimeLong</params>
+                                </step>
+                                <step>
+                                    <type>LTRIM</type>
+                                    <params>[</params>
+                                </step>
+                                <step>
+                                    <type>RTRIM</type>
+                                    <params>]</params>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>omada.discover.devices</key>
+                            </master_item>
+                        </item_prototype>
+                    </item_prototypes>
+                    <master_item>
+                        <key>omada.discover.devices</key>
+                    </master_item>
+                    <lld_macro_paths>
+                        <lld_macro_path>
+                            <lld_macro>{#APNAME}</lld_macro>
+                            <path>$.name</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#APIP}</lld_macro>
+                            <path>$.ip</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#APSTATUSCATEGORY}</lld_macro>
+                            <path>$.statusCategory</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#APSTATUS}</lld_macro>
+                            <path>$.status</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#APUPTIME}</lld_macro>
+                            <path>$.uptimeLong</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#APSITEKEY}</lld_macro>
+                            <path>$.site</path>
+                        </lld_macro_path>
+                    </lld_macro_paths>
+                </discovery_rule>
+                <discovery_rule>
+                    <name>Parse JSON discovered Sites</name>
+                    <type>DEPENDENT</type>
+                    <key>omada.JSON.discover.sites</key>
+                    <delay>0</delay>
+                    <lifetime>8h</lifetime>
+                    <item_prototypes>
+                        <item_prototype>
+                            <name>SiteName {#SITESNAME}</name>
+                            <type>DEPENDENT</type>
+                            <key>prototype.sites.key[{#SITESKEY}]</key>
+                            <delay>0</delay>
+                            <trends>0</trends>
+                            <value_type>TEXT</value_type>
+                            <applications>
+                                <application>
+                                    <name>OmadaAPI</name>
+                                </application>
+                            </applications>
+                            <preprocessing>
+                                <step>
+                                    <type>JSONPATH</type>
+                                    <params>$.[?(@.name == &quot;{#SITESNAME}&quot;)].key</params>
+                                </step>
+                                <step>
+                                    <type>LTRIM</type>
+                                    <params>[</params>
+                                </step>
+                                <step>
+                                    <type>RTRIM</type>
+                                    <params>]</params>
+                                </step>
+                            </preprocessing>
+                            <master_item>
+                                <key>omada.sites</key>
+                            </master_item>
+                        </item_prototype>
+                    </item_prototypes>
+                    <master_item>
+                        <key>omada.sites</key>
+                    </master_item>
+                    <lld_macro_paths>
+                        <lld_macro_path>
+                            <lld_macro>{#SITESNAME}</lld_macro>
+                            <path>$.name</path>
+                        </lld_macro_path>
+                        <lld_macro_path>
+                            <lld_macro>{#SITESKEY}</lld_macro>
+                            <path>$.key</path>
+                        </lld_macro_path>
+                    </lld_macro_paths>
+                </discovery_rule>
+            </discovery_rules>
+        </template>
+    </templates>
+    <value_maps>
+        <value_map>
+            <name>Omada TP-link Status</name>
+            <mappings>
+                <mapping>
+                    <value>0</value>
+                    <newvalue>Disconnected</newvalue>
+                </mapping>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>Disconnected(Migrating)</newvalue>
+                </mapping>
+                <mapping>
+                    <value>10</value>
+                    <newvalue>Provisioning</newvalue>
+                </mapping>
+                <mapping>
+                    <value>11</value>
+                    <newvalue>Configuring</newvalue>
+                </mapping>
+                <mapping>
+                    <value>12</value>
+                    <newvalue>Upgrading</newvalue>
+                </mapping>
+                <mapping>
+                    <value>13</value>
+                    <newvalue>Rebooting</newvalue>
+                </mapping>
+                <mapping>
+                    <value>14</value>
+                    <newvalue>Connected</newvalue>
+                </mapping>
+                <mapping>
+                    <value>15</value>
+                    <newvalue>Connected(Wireless)</newvalue>
+                </mapping>
+                <mapping>
+                    <value>16</value>
+                    <newvalue>Connected(Migrating)</newvalue>
+                </mapping>
+                <mapping>
+                    <value>17</value>
+                    <newvalue>Connected(Wireless,Migrating)</newvalue>
+                </mapping>
+                <mapping>
+                    <value>20</value>
+                    <newvalue>Pending</newvalue>
+                </mapping>
+                <mapping>
+                    <value>21</value>
+                    <newvalue>Pending(Wireless)</newvalue>
+                </mapping>
+                <mapping>
+                    <value>22</value>
+                    <newvalue>Adopting</newvalue>
+                </mapping>
+                <mapping>
+                    <value>23</value>
+                    <newvalue>Adopting(Wireless)</newvalue>
+                </mapping>
+                <mapping>
+                    <value>24</value>
+                    <newvalue>Adopt Failed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>25</value>
+                    <newvalue>Adopt Failed(Wireless)</newvalue>
+                </mapping>
+                <mapping>
+                    <value>26</value>
+                    <newvalue>Managed By Others</newvalue>
+                </mapping>
+                <mapping>
+                    <value>27</value>
+                    <newvalue>Managed By Others(Wireless)</newvalue>
+                </mapping>
+                <mapping>
+                    <value>30</value>
+                    <newvalue>Heartbeat Missed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>31</value>
+                    <newvalue>Heartbeat Missed(Wireless)</newvalue>
+                </mapping>
+                <mapping>
+                    <value>32</value>
+                    <newvalue>Heartbeat Missed(Migrating)</newvalue>
+                </mapping>
+                <mapping>
+                    <value>33</value>
+                    <newvalue>Heartbeat Missed(Wireless,Migrating)</newvalue>
+                </mapping>
+                <mapping>
+                    <value>40</value>
+                    <newvalue>Isolated</newvalue>
+                </mapping>
+                <mapping>
+                    <value>41</value>
+                    <newvalue>Isolated(Migrating)</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+        <value_map>
+            <name>Omada TP-link StatusCategory</name>
+            <mappings>
+                <mapping>
+                    <value>0</value>
+                    <newvalue>Disconnected</newvalue>
+                </mapping>
+                <mapping>
+                    <value>1</value>
+                    <newvalue>Connected</newvalue>
+                </mapping>
+                <mapping>
+                    <value>2</value>
+                    <newvalue>Pending</newvalue>
+                </mapping>
+                <mapping>
+                    <value>3</value>
+                    <newvalue>Heartbeat Missed</newvalue>
+                </mapping>
+                <mapping>
+                    <value>4</value>
+                    <newvalue>Isolated</newvalue>
+                </mapping>
+            </mappings>
+        </value_map>
+    </value_maps>
+</zabbix_export>
