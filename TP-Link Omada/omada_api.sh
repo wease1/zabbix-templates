@@ -3,8 +3,7 @@
 # set variables
 OMADA_URL="https://172.16.131.26:8043"
 UNAME="apiuser"
-PASSWD="As1234567"
-## bewCiwel!@
+PASSWD="********"
 
 # get controller id from the API
 CONTROLLER_ID="$(curl -sk "${OMADA_URL}/api/info" | jq -r .result.omadacId)"
